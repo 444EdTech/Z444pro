@@ -32,15 +32,40 @@ import JoinGroup from "./components/JoinGroup"
 import GroupsList from "./components/GroupsList"
 import QuoteComponent from "./components/QuoteComponent"
 
+// function PrivateRoute({ children, allowedRoles }) {
+//   const { user } = useContext(UserContext)
+
+//   if (!user || !allowedRoles.includes(user.role)) {
+//     return <Navigate to="/" />
+//   }
+
+//   return children
+// }
+
+import { useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
+
 function PrivateRoute({ children, allowedRoles }) {
   const { user } = useContext(UserContext)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   if (!user || !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" />
+    Swal.fire({
+      title: "Please Login",
+      text: "You need to log in to access this page. Please login to get access",
+      icon: "info",
+      confirmButtonText: "Login",
+    }).then(() => {
+      navigate(`/`)
+      // navigate(`/login/learner?redirect=${location.pathname}`)
+    })
+    return null
   }
 
   return children
 }
+
 
 function Navbar() {
   const { user, logout } = useContext(UserContext)
@@ -120,11 +145,11 @@ function Navbar() {
                     Guide Login
                   </Link>
                 </li>
-                <li className="nav-item">
+                {/* <li className="nav-item">
                   <Link to="/login/admin" className="nav-link btn btn-cool btn-sm me-2">
                     Admin Login
                   </Link>
-                </li>
+                </li> */}
               </>
             )}
             {user && (

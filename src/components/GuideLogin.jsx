@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../supabase';
 import bcrypt from 'bcryptjs';
 import { UserContext } from '../contexts/UserContext';
@@ -9,6 +9,8 @@ function GuideLogin() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const { login } = useContext(UserContext);
+  const location = useLocation()
+  const redirectPath = new URLSearchParams(location.search).get("redirect") || "/dashboard/guide"
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -42,7 +44,7 @@ function GuideLogin() {
           title: user.title,
         };
         login(userDetails);
-        navigate('/dashboard/guide');
+        navigate(redirectPath, { replace: true })
       } else {
         alert('Invalid email/username or password.');
       }
@@ -51,6 +53,12 @@ function GuideLogin() {
       alert('Error logging in. Please try again.');
     }
   };
+
+  useEffect(() => {
+    if (new URLSearchParams(location.search).has("redirect")) {
+      navigate(location.pathname, { replace: true })
+    }
+  }, [location, navigate])
 
   return (
     <div className="container">
